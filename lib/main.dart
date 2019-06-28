@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sample/Home.dart';
+import 'dart:convert';
+
+// 引入http
+import 'package:http/http.dart' as http;
 
 /*
  * Flutter学习一：最简单的Flutter应用
@@ -29,6 +33,8 @@ import 'package:flutter_sample/Home.dart';
  * Flutter学习九：Http练习
  * https://blog.csdn.net/sinat_29256651/article/details/81394923
  *
+ * Flutter Widget整理
+ *https://blog.csdn.net/sinat_29256651/article/details/84962892
  *
  */
 //void main() => runApp(MyApp());
@@ -44,12 +50,11 @@ void main() {
 //  GestureDetectorWidget(),
 //    TestFieldWidget(),
 //    NavigatorWidget(),
-      HttpTest(),
+    HttpTest(),
   );
 }
 
-class HttpTest extends StatelessWidget{
-
+class HttpTest extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -66,7 +71,6 @@ class HttpTest extends StatelessWidget{
 // 发送请求-->读取body中的数据-->解析完成-->设置状态
 // http: 0.11.3+16
 class HttpTestPage extends StatefulWidget {
-
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
@@ -75,6 +79,15 @@ class HttpTestPage extends StatefulWidget {
 }
 
 class _HttpTestState extends State<HttpTestPage> {
+  List widgets = [];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // 加载数据
+    loadData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +96,29 @@ class _HttpTestState extends State<HttpTestPage> {
       appBar: AppBar(
         title: new Text('HttpTestState'),
       ),
+      body: new ListView.builder(
+          itemCount: widgets.length,
+          itemBuilder: (BuildContext context, int position) {
+            return getRow(position);
+          }),
     );
+  }
+
+  Future loadData() async {
+    String dataURL = "https://jsonplaceholder.typicode.com/posts";
+    http.Response response = await http.get(dataURL);
+    setState(() {
+      widgets = json.decode(response.body);
+    });
+  }
+
+  Widget getRow(int position) {
+    return new Padding(padding: EdgeInsets.all(10.0),
+//    child: new Text('获取的内容: ${widgets[position]}'),);
+    // 获取数据id
+//    child: new Text('获取的内容: ${widgets[position]['id']}'),);
+    // 获取数据title
+    child: new Text('获取的内容: ${widgets[position]['title']}'),);
   }
 }
 
@@ -133,12 +168,12 @@ class SecondPage extends StatelessWidget {
       ),
       body: new Center(
         child: new RaisedButton(
-          //onPressed  点击事件
-          child: Text('点我回到第一个页面'),
-            onPressed: (){
+            //onPressed  点击事件
+            child: Text('点我回到第一个页面'),
+            onPressed: () {
               //回到上一个页面 相当于finish
               Navigator.pop(context);
-        }),
+            }),
       ),
     );
   }
